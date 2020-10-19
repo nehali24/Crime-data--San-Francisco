@@ -1,2 +1,2 @@
 # Crime-data--San-Francisco
-In this data set . i have analysed crime data for  San Francisco, bringing out the insights of what type of crime is most trending.
+In this data set . i have analysed crime data for  San Francisco, bringing out the insights of what type of crime is most trending. In thisdataset there is a comparative analysis of cibilian reported incidents and police reported incidents. Firstly datasets were combined by the shared dates and relationship between civilian-reported incidents and police-reported incidents by the date on which the incidents were documented. 
