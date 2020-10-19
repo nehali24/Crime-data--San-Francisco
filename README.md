@@ -6,3 +6,11 @@ In this data set . i have analysed crime data for  San Francisco, bringing out t
 When a correlation coefficient was calculated between frequency of incidents and calls on a day-to-day basis, it came out to be 0.2384811, which s quite optimal. 
 
 Call Reported crimes: 
+
+![unnamed-chunk-21-1](https://user-images.githubusercontent.com/60546284/96460047-b92b3b80-121a-11eb-8935-67e1836cf8b0.png)
+
+Incident Reported crimes:
+
+![unnamed-chunk-25-1](https://user-images.githubusercontent.com/60546284/96460176-da8c2780-121a-11eb-9eba-93d43042bf0a.png)
+
+
