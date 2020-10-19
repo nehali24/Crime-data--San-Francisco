@@ -1,0 +1,306 @@
+---
+title: "crime_2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+library(lubridate)
+library(ggplot2)
+```
+
+```{r}
+incident <- read.csv("police-department-incidents.csv")
+incident
+```
+
+```{r}
+call_for_service <- read.csv("police-department-calls-for-service.csv")
+call_for_service
+```
+
+```{r}
+glimpse(call_for_service)
+
+```
+
+```{r}
+glimpse(incident)
+```
+
+```{r}
+daily_incidents <- incident %>%
+  count(Date, sort = TRUE) %>%
+  rename(n_incidents = n)
+daily_incidents
+
+
+  
+  
+```
+
+```{r}
+daily_calls <- call_for_service %>%
+  count(Call.Date, sort = TRUE)%>%
+  rename(n_calls = n)
+daily_calls
+```
+
+```{r}
+daily_calls
+```
+
+```{r}
+shared_dates <- inner_join(daily_incidents, daily_calls, by = c("Date" = "Call.Date"))
+shared_dates
+glimpse(shared_dates)
+```
+
+```{r}
+plot_shared_dates <- shared_dates %>%
+  gather(key = report, value = count, -Date)
+ggplot(plot_shared_dates, aes(x = Date, y = count, color = report)) +
+  geom_point() +
+  geom_smooth(method = "lm",formula = y ~ x)
+ 
+  
+```
+
+```{r}
+daily_cor <- cor(shared_dates$n_incidents, shared_dates$n_calls)
+daily_cor
+```
+
+```{r}
+correlation_df <- shared_dates %>%
+  mutate(month = month(Date)) %>%
+  group_by(month) 
+correlation_df
+
+```
+
+```{r}
+correlation_df%>%
+  summarise(n_incidents = sum(n_incidents), n_calls = sum(n_calls))
+```
+
+```{r}
+monthly_cor <- cor(correlation_df$n_incidents, correlation_df$n_calls)
+monthly_cor
+```
+```{r}
+calls_shared_dates <- semi_join(call_for_service, shared_dates, by = c("Call.Date.Time" = "Date"))
+calls_shared_dates
+```
+```{r}
+identical(sort(unique(shared_dates$Date)), sort(unique(calls_shared_dates$Date)))
+incident_shared_dates <- incident %>%
+  semi_join(shared_dates, by = c("Date" = "Date"))
+```
+```{r}
+incident_shared_dates
+```
+```{r}
+library(janitor)
+```
+
+```{r}
+calls_shared_dates_clean <- calls_shared_dates %>%
+  clean_names()
+calls_shared_dates_clean
+
+```
+
+
+```{r}
+calls_shared_dates_clean %>%
+  rename(crime = original_crime_type_name) %>%
+  count(crime) %>%
+  top_n(15,n) %>%
+  ggplot(aes(x = reorder(crime,n), y = n , fill = n)) +
+  geom_bar(stat = "identity") +
+  ylab("Count") +
+  xlab("Crime description") +
+  ggtitle("Call reported crimes") +
+  coord_flip()
+```
+```{r}
+calls_shared_dates_clean
+```
+```{r}
+incident_shared_dates
+```
+```{r}
+library(ggthemes)
+```
+
+```{r}
+plot_incidents_freq <- incident_shared_dates %>%
+  count(Descript) %>%
+  top_n(15,n) %>%
+  ggplot(aes(x = reorder(Descript,n), y = n),colour = crime) +
+  geom_bar(stat = "identity", fill = "#FF9999") +
+  ylab("Count") +
+  xlab("Crime") +
+  ggtitle(" Incidents Reported Crimes") +
+  coord_flip() 
+  
+plot_incidents_freq
+  
+
+  
+
+```
+```{r}
+calls_shared_dates_clean
+```
+
+```{r}
+location_calls <- calls_shared_dates_clean %>%
+  filter(original_crime_type_name == "Auto Boost / Strip") %>%
+  count(common_location) %>%
+  arrange(desc(n))%>%
+  top_n(10)
+  
+
+```
+```{r}
+incident_shared_dates
+```
+
+```{r}
+location_incidents <- incident_shared_dates %>%
+  filter(Descript == "GRAND THEFT FROM LOCKED AUTO") %>%
+  count(Address)%>%
+  arrange(desc(n)) %>%
+  top_n(10,n)
+location_incidents
+
+
+```
+```{r}
+calls_shared_dates_clean
+```
+
+```{r}
+location_calls <- calls_shared_dates_clean %>%
+  filter(original_crime_type_name == "Auto Boost / Strip")%>%
+  count(address) %>%
+  arrange(desc(n)) %>%
+  top_n(10,n)
+location_calls
+
+  
+```
+
+```{r}
+library(ggplot2)
+library(ggrepel)
+library(ggmap)
+library(sf)
+library(leaflet)
+library(rnaturalearth)
+library(rnaturalearthdata)
+install.packages("MAP")
+install.packages(c("maps", "mapdata"))
+
+```
+```{r}
+library(maps)
+library(mapdata)
+```
+```{r}
+install.packages("RCurl")
+install.packages("RJSONIO")
+install.packages("plyr")
+library(RCurl)
+library(RJSONIO)
+library(plyr)
+```
+```{r}
+library(ggplot2)
+library(ggmap)
+library(RgoogleMaps)
+```
+
+```{r}
+ggmap::register_google(key = "AIzaSyCVZxmXQa-KsuCqi49At0tRm6QKjofdgLI")
+
+```
+
+
+```{r}
+install.packages("ggmap")
+```
+
+
+```{r}
+map <- debug(get_googlemap(center = c(lon = -122.335167, lat = 37.7749),
+                           zoom = 11, scale = 2,
+                    maptype ='terrain',
+                    color = 'color'))
+map + geom_point(aes(x = Longitude, y = Latitude,  colour = Initial.Type.Group), data = calls_shared_dates_clean, size = 0.5) + 
+  theme(legend.position="bottom")
+
+```
+
+
+```{r}
+sfmap <- qmap
+```
+```{r}
+library(RgoogleMaps)
+```
+
+```{r}
+
+
+san_francisco_map <- leaflet() %>%
+  addTiles() %>%  
+  addMarkers(lng=-122.4194, lat=37.7749,
+             popup="San Francisco")
+san_francisco_map
+  
+
+
+
+```
+```{r}
+incident_shared_dates
+```
+
+```{r}
+auto_incidents <- incident_shared_dates%>%
+  filter(Descript == "GRAND THEFT FROM LOCKED AUTO")
+auto_incidents
+```
+
+```{r}
+
+san_map <- save(san_francisco_map, file = "~san_francisco_map.rda")
+```
+
+```{r}
+
+get_map(san_map) +
+  stat_density_2d(
+    aes(x = X, y = Y, fill = ..level..), alpha = 0.15,
+    size = 0.01, bins = 30, data = auto_incidents,
+    geom = "polygon")
+```
+
+```{r}
+ggmap(san_francisco_map) +
+  stat_density_2d(
+    aes(x = X, y = Y, fill = ..level..), alpha = 0.15,
+    size = 0.01, bins = 30, data = auto_incidents,
+    geom = "polygon")
+```
+
