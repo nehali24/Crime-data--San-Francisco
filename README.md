@@ -9,8 +9,11 @@ Call Reported crimes:
 
 ![unnamed-chunk-21-1](https://user-images.githubusercontent.com/60546284/96460047-b92b3b80-121a-11eb-8935-67e1836cf8b0.png)
 
+
+
 Incident Reported crimes:
 
 ![unnamed-chunk-25-1](https://user-images.githubusercontent.com/60546284/96460176-da8c2780-121a-11eb-9eba-93d43042bf0a.png)
 
 
+Crime of highest incidence is GRAND THEFT FROM LOCKED AUTO. This categroy has many crimes reported of the opprtunity where unsupervised vehicles are broken into. 
